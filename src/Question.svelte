@@ -35,9 +35,20 @@
 
         await tick();
     }
+
+    function viewMoreInfo(question) {
+        console.log('viewMoreInfo coming soon',question.id)
+    }
+
+    function flagForError(question) {
+        console.log('flagForError coming soon',question.id)
+    }
 </script>
 
-<style>
+<style type="text/scss">
+    $color: #3344ee;
+    $color-secondary: #c2c5e8;
+
     .loading {
         opacity: 0;
         animation: 0.1s 0.8s forwards fade-in;
@@ -60,27 +71,44 @@
         margin: 0 auto;
         width: 90%;
     }
+
+    .blue-span {
+        color: $color;
+        font-weight: bold;
+    }
+
+    .secondary-button {
+        background-color: $color-secondary;
+        color: white;
+    }
+
+    .warning-button {
+        background-color: #f7897f;
+        color: white;
+    }
 </style>
 
 <div class="question-comp">
     {#if question}
         <div class="question-div">
-            <h2><strong>Category: </strong>{question.category}</h2>
-            <p><strong>Value: </strong>${question.adj_value2}</p>
+            <h2><span class="blue-span">Category: </span>{question.category}</h2>
+            <p><span class="blue-span">Value: </span>${question.adj_value2}</p>
             <p>
-                <strong>Question: </strong>
+                <span class="blue-span">Question: </span>
                 {@html question.question}
             </p>
-            <button on:click={toggleAnswer}>Show/Hide Answer</button>
+            <button on:click={toggleAnswer}>Show Answer</button>
             {#if viewAnswer}
                 <p>
-                    <strong>Answer: </strong>
+                    <span class="blue-span">Answer: </span>
                     {@html question.answer}
                 </p>
                 <button on:click={nextClue}>Next Clue</button>
+                <button class="secondary-button" on:click={viewMoreInfo(question)}>View More Info</button>
+                <button class="warning-button" on:click={flagForError(question)}>Flag for Errors</button>
             {/if}
         </div>
     {:else}
-        <p class="loading">loading...</p>
+        <p class="loading">Loading...</p>
     {/if}
 </div>
