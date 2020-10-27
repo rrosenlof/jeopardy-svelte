@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     let question;
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
 
@@ -19,13 +19,28 @@
         viewAnswer = !viewAnswer;
     }
 
-    function newQuestion() {}
+    async function nextClue(event) {
+        viewAnswer = false;
+        question = '';
+        event.preventDefault();
+
+        fetch(
+            `${proxyurl}https://jeopardy-rest-api.herokuapp.com/api/v1/jeopardy/questions/random`
+        )
+            .then((r) => r.json())
+            .then((data) => {
+                console.dir(data);
+                question = data;
+            });
+
+        await tick();
+    }
 </script>
 
 <style>
     .loading {
         opacity: 0;
-        animation: 0.4s 0.8s forwards fade-in;
+        animation: 0.1s 0.8s forwards fade-in;
     }
     @keyframes fade-in {
         from {
@@ -35,29 +50,37 @@
             opacity: 1;
         }
     }
-    #q-value {
-        font-style: italic;
+
+    .question-div {
+        padding: 0.3rem 1.3rem;
+        background-color: #f3f3f7;
     }
+
     .question-comp {
-		margin: 0 auto;
-		width: 60%;
-	}
+        margin: 0 auto;
+        width: 90%;
+    }
 </style>
 
 <div class="question-comp">
-{#if question}
-    <div id="question-div">
-        <h2>{question.category}</h2>
-        <p>Value: <span id="q-value">${question.adj_value2}</span></p>
-        <p>{question.question}</p>
-        <hr />
-        <button on:click={toggleAnswer}>Show/Hide Answer</button>
-        {#if viewAnswer}
-            <p>{question.answer}</p>
-            <!-- <button on:click={newQuestion}>Next Question</button> -->
-        {/if}
-    </div>
-{:else}
-    <p class="loading">loading...</p>
-{/if}
+    {#if question}
+        <div class="question-div">
+            <h2><strong>Category: </strong>{question.category}</h2>
+            <p><strong>Value: </strong>${question.adj_value2}</p>
+            <p>
+                <strong>Question: </strong>
+                {@html question.question}
+            </p>
+            <button on:click={toggleAnswer}>Show/Hide Answer</button>
+            {#if viewAnswer}
+                <p>
+                    <strong>Answer: </strong>
+                    {@html question.answer}
+                </p>
+                <button on:click={nextClue}>Next Clue</button>
+            {/if}
+        </div>
+    {:else}
+        <p class="loading">loading...</p>
+    {/if}
 </div>
